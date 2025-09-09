@@ -1,18 +1,18 @@
 from aiogram import Router, types
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from database import data_names
+from database import mark_payment
 
-def proverka(frist_leters):
-    # Добавляем кнопки с именами (по 2 в ряд)
-    count = False
+
+def proverka(frist_leters:str):
     for name in data_names:
-        if frist_leters in name:
-            count = True
-    return count
+        if frist_leters.lower() in name.lower():
+            return True
+    return False
 
 
 
@@ -21,7 +21,7 @@ def keyboard_from_students(frist_leters):
 
     # Добавляем кнопки с именами (по 2 в ряд)
     for name in data_names:
-        if frist_leters in name:
+        if frist_leters.lower() in name.lower():
             count = True
             builder.add(KeyboardButton(text=name))
 
@@ -42,14 +42,19 @@ class Form(StatesGroup):
 
 
 def get_months_keyboard():
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Январь"), KeyboardButton(text="Февраль")],
-            [KeyboardButton(text="Март"), KeyboardButton(text="Апрель")],
-            [KeyboardButton(text="Май"), KeyboardButton(text="Июнь")],
-        ],
-        resize_keyboard=True
-    )
+    builder = ReplyKeyboardBuilder()
+
+    months = [
+        "Январь", "Февраль", "Март",
+        "Апрель", "Май", "Июнь",
+        "Июль", "Август", "Сентябрь",
+        "Октябрь", "Ноябрь", "Декабрь"
+    ]
+
+    for i in months:
+        builder.add(KeyboardButton(text=i))
+    builder.adjust(2)
+    return builder.as_markup(resize_keyboard=True)
 
 
 @get_students_list_router.callback_query(lambda c: c.data == 'btn2')
@@ -85,5 +90,6 @@ async def choose_month(message: types.Message, state: FSMContext):
     data = await state.get_data()
     name = data["name"]  # имя ребёнка
     month = message.text
-    await message.answer(f"✅ Оплата за {month} для {name} зарегистрирована!")
+    await message.answer(f"✅ Оплата за {month} для {name} зарегистрирована!",reply_markup=ReplyKeyboardRemove())
+    mark_payment(name,month.lower())
     await state.clear()

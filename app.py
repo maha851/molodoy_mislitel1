@@ -6,6 +6,7 @@ from dotenv import find_dotenv, load_dotenv
 
 from handlers.user_private import user_private_router
 from database import router
+from common.bot_comands_list  import private
 from get_students.get_stdnts import get_students_list_router
 load_dotenv(find_dotenv())
 
@@ -22,7 +23,7 @@ dp.include_router(get_students_list_router)
 
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
-
+    await bot.set_my_commands(commands=private, scope=types.BotCommandScopeAllPrivateChats())
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

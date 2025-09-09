@@ -8,14 +8,17 @@ user_private_router = Router()
 
 
 @user_private_router.message(CommandStart())
-async def comand_start(message: types.Message,user: types.User):
+async def comand_start(message: types.Message):
+    first_name = message.from_user.first_name  # имя
+    last_name = message.from_user.last_name  # фамилия (может быть None)
+    username = message.from_user.username
     keyboard = InlineKeyboardMarkup(
     inline_keyboard = [
         # Первый ряд кнопок
         [
             InlineKeyboardButton(text="Ok", callback_data="btn1")
         ]])
-    await message.answer(f'''Ассаламу алейкум уа рахматуЛЛахи уа баракятух, {user.username}! 👋
+    await message.answer(f'''Ассаламу алейкум уа рахматуЛЛахи уа баракятух, {first_name} {last_name} or {username}! 👋
     Я — бот-помощник для учёта оплат за учеников курса «Молодой мыслитель» 📚
      Важно: я не проверяю факт оплаты — я только ставлю отметку ✅, потому что мы доверяем вам 🤝
      Нажмите кнопку ниже, чтобы посмотреть способы оплаты 💳👇''',reply_markup=keyboard)
