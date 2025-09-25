@@ -1,12 +1,26 @@
-from aiogram import Router, types
+import os
+from fileinput import filename
+from io import BytesIO
+
+from aiogram import Router, types, Bot, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from aiogram.types import KeyboardButton, ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from dotenv import load_dotenv, find_dotenv
 
-from database import data_names
-from database import mark_payment
+from database.database import data_names
+from database.database import mark_payment
+from photo_operation.google_drive_auth import get_drive
+from photo_operation.operation_with_photo import download_telegram_file, upload_to_google_drive, drive
+load_dotenv(find_dotenv())
 
+phone_number = '+79788705926'
+TOKEN=os.getenv('TOKEN')
+
+FOLDER_ID = '1ymw4Avo1HWhBrtYt_mlN4E6Is9KVFo2-'
+
+drive = get_drive()
 
 def proverka(frist_leters:str):
     for name in data_names:
@@ -22,7 +36,6 @@ def keyboard_from_students(frist_leters):
     # Добавляем кнопки с именами (по 2 в ряд)
     for name in data_names:
         if frist_leters.lower() in name.lower():
-            count = True
             builder.add(KeyboardButton(text=name))
 
     # Добавляем кнопку отмены
@@ -34,27 +47,13 @@ def keyboard_from_students(frist_leters):
 
 
 get_students_list_router = Router()
+
 class Form(StatesGroup):
     waiting_for_name_letters = State()
     waiting_for_child = State()
     waiting_for_month = State()
+    waiting_for_photo = State()
 
-
-
-def get_months_keyboard():
-    builder = ReplyKeyboardBuilder()
-
-    months = [
-        "Январь", "Февраль", "Март",
-        "Апрель", "Май", "Июнь",
-        "Июль", "Август", "Сентябрь",
-        "Октябрь", "Ноябрь", "Декабрь"
-    ]
-
-    for i in months:
-        builder.add(KeyboardButton(text=i))
-    builder.adjust(2)
-    return builder.as_markup(resize_keyboard=True)
 
 
 @get_students_list_router.callback_query(lambda c: c.data == 'btn2')
@@ -72,24 +71,47 @@ async def process_name_letters(message: types.Message, state: FSMContext):
     elif len(user_input) != 3:
         await message.answer('длинна введённого сообщения не равняется трём')
     elif not proverka(user_input):
-        await message.answer(f'ученика, имя которого начинается на {user_input} нет.Попробуйте ввести сново')
+        await message.answer(f'''Ученика, имя которого начинается на {user_input} нету в списках учеников.
+    Если вы неправильно ввели первые три буквы имени вашего ученика,нажмите /start чтобы начать процесс оплаты заново.
+    Но если вы всё правильно ввели, то напишите  на Whatsapp {phone_number}
+     или в родительскую группу, откуда вы попали сюда, и мы всё починим 🙂''')
+        await state.set_state(None)
 
 
 
-@get_students_list_router.message(Form.waiting_for_child)
-async def choose_child(message: types.Message, state: FSMContext):
-        # сохраняем выбор
-    await state.update_data(name=message.text)
-    name = message.text
-    await message.answer(f"Вы выбрали: {name}\nТеперь выберите месяц:",
-                         reply_markup=get_months_keyboard())
-    await state.set_state(Form.waiting_for_month)
-
-@get_students_list_router.message(Form.waiting_for_month)
-async def choose_month(message: types.Message, state: FSMContext):
+@get_students_list_router.message(Form.waiting_for_photo,F.photo)
+async def wait_photo(message: types.Message,state: FSMContext):
     data = await state.get_data()
-    name = data["name"]  # имя ребёнка
-    month = message.text
-    await message.answer(f"✅ Оплата за {month} для {name} зарегистрирована!",reply_markup=ReplyKeyboardRemove())
-    mark_payment(name,month.lower())
+    name = data["name"]
+    month = data['selected']
+    file_id = message.photo[-1].file_id
+    buf, ext = download_telegram_file(TOKEN, file_id)
+    filename = f"Оплата_от_{name} за {month}.{ext}"
+    upload_to_google_drive(drive, buf, ext, FOLDER_ID,filename)
+    await message.answer('''✅ оплата успешно прошла!
+    ДжазакиЛлаха хайран за оплату! 🌟
+Я ещё совсем молодой и могу ошибаться. Если что-то пошло не так, 
+напишите на Whatsapp +79788705926 или в родительскую группу, откуда вы попали сюда, и мы всё починим 🙂''')
+    for i in month:
+        mark_payment(name,i.lower())
+    await state.clear()
+
+@get_students_list_router.message(F.document & (F.document.mime_type == "application/pdf"))
+async def upload_pdf(message: types.Message, bot,state: FSMContext):
+    data = await state.get_data()
+    name = data["name"]
+    month = data['selected']
+    # скачиваем документ в память
+    buf = BytesIO()
+    await bot.download(message.document, destination=buf)
+    buf.seek(0)
+    # вытаскиваем расширение
+    ext = "pdf"
+    filename = f"Оплата_от_{name} за {month}.{ext}"
+    # грузим в диск
+    upload_to_google_drive(drive, buf, ext, FOLDER_ID,filename)
+    await message.answer(f"✅ оплата успешно прошла!")
+    for i in month:
+        mark_payment(name, i.lower())
+
     await state.clear()
