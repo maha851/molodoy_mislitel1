@@ -1,0 +1,9 @@
+token.json
+.env
+token.pickle
+
+# виртуальное окружение
+venv/
+
+# служебные файлы PyCharm
+.idea/
