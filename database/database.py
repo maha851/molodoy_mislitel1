@@ -9,7 +9,7 @@ from aiogram import Router, F
 from aiogram.types import Message
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-CREDS = service_account.Credentials.from_service_account_file('/home/ahma/Загрузки/hidden-cat-470607-a5-7611437960ad.json', scopes=SCOPES)
+CREDS = service_account.Credentials.from_service_account_file('/home/ahma/PycharmProject/Molodoy_mislitel/hidden-cat-470607-a5-7611437960ad.json', scopes=SCOPES)
 service = build('sheets', 'v4', credentials=CREDS)
 SPREADSHEET_ID = '1YbHyUySI6IAymP8QlF1-w4Z02ibqQWhLUOmWZNNN96c'
 SHEET_NAME = 'Ученики'
