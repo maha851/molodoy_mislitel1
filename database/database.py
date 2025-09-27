@@ -1,15 +1,22 @@
+import os
 from io import BytesIO
 
 import requests
+from dotenv import load_dotenv, find_dotenv
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from sqlalchemy.util import await_only
 
-from aiogram import Router, F
+from aiogram import Router, F, Bot
 from aiogram.types import Message
 
+load_dotenv(find_dotenv())
+
+
+HidenCat=os.getenv('HidenCat')
+
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-CREDS = service_account.Credentials.from_service_account_file('/home/ahma/PycharmProject/Molodoy_mislitel/hidden-cat-470607-a5-7611437960ad.json', scopes=SCOPES)
+CREDS = service_account.Credentials.from_service_account_file(HidenCat, scopes=SCOPES)
 service = build('sheets', 'v4', credentials=CREDS)
 SPREADSHEET_ID = '1YbHyUySI6IAymP8QlF1-w4Z02ibqQWhLUOmWZNNN96c'
 SHEET_NAME = 'Ученики'
