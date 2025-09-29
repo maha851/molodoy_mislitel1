@@ -4,6 +4,7 @@ import requests
 from io import BytesIO
 from datetime import datetime
 
+from dotenv import find_dotenv, load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -15,7 +16,18 @@ from photo_operation.google_drive_auth import get_drive
 
 drive = get_drive()
 
+
+load_dotenv(find_dotenv())
+
+Outh=os.getenv('Outh')
+token=os.getenv('token')
+
+DEFAULT_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+DEFAULT_CREDS_FILE = Outh  # скачиваете из GCP (OAuth Client ID → Desktop App)
+DEFAULT_TOKEN_FILE = token
+
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+
 
 creds = None
 if os.path.exists("token.pickle"):
