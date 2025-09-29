@@ -26,21 +26,12 @@ DEFAULT_TOKEN_FILE = os.getenv('token') or "/home/botuser/molodoy_mislitel1/cred
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 
 
-creds = None
-if os.path.exists("token.pickle"):
-    with open("token.pickle", "rb") as token:
-        creds = pickle.load(token)
-
-if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-        creds.refresh(Request())
-    else:
-        flow = InstalledAppFlow.from_client_secrets_file(DEFAULT_CREDS_FILE, SCOPES)
-        creds = flow.run_local_server(port=0)
-    with open("token.pickle", "wb") as token:
-        pickle.dump(creds, token)
-
-drive = build("drive", "v3", credentials=creds)
+_drive = None
+def drive():
+    global _drive
+    if _drive is None:
+        _drive = get_drive()  # внутри уже учтены RUN_ON_SERVER/ENV/token.json/и т.д.
+    return _drive
 
 
 def download_telegram_file(bot_token: str, file_id: str) -> tuple[BytesIO, str]:
