@@ -42,6 +42,8 @@ def get_creds(
     Возвращает валидные OAuth-учётные данные (Credentials).
     Если token_file существует — подхватывает; иначе запускает браузер для логина.
     """
+    creds_file = DEFAULT_CREDS_FILE
+    token_file = DEFAULT_TOKEN_FILE
     scopes = list(scopes or DEFAULT_SCOPES)
 
     if not isinstance(token_file, str) or not token_file:
