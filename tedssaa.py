@@ -3,7 +3,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
 
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]  # как в проде
-CREDS_FILE = "oauth.json"                                # путь к вашему client_secret
+CREDS_FILE = "/home/botuser/molodoy_mislitel1/creds/oauth.json"                                # путь к вашему client_secret
 
 flow = InstalledAppFlow.from_client_secrets_file(CREDS_FILE, SCOPES)
 creds: Credentials = flow.run_local_server(port=0)       # откроет браузер
