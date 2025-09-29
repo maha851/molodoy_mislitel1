@@ -1,11 +1,9 @@
-token.json
 .env
+token.json
 token.pickle
 hidden-cat-470607-a5-7611437960ad.json
 outh.json
 
-# виртуальное окружение
 venv/
 
-# служебные файлы PyCharm
 .idea/

@@ -8,9 +8,10 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+from database.database import Outh
 
 DEFAULT_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
-DEFAULT_CREDS_FILE = '/home/ahma/Загрузки/outh.json'  # скачиваете из GCP (OAuth Client ID → Desktop App)
+DEFAULT_CREDS_FILE = Outh  # скачиваете из GCP (OAuth Client ID → Desktop App)
 DEFAULT_TOKEN_FILE = "token.json"        # создастся автоматически после 1-го входа
 
 
