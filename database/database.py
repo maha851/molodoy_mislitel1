@@ -14,7 +14,7 @@ load_dotenv(find_dotenv())
 
 
 HidenCat=os.getenv('HidenCat')
-Outh = os.getenv('outH')
+Outh = os.getenv('outh')
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 CREDS = service_account.Credentials.from_service_account_file(HidenCat, scopes=SCOPES)
