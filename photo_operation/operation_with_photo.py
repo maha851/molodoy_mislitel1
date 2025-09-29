@@ -19,12 +19,9 @@ drive = get_drive()
 
 load_dotenv(find_dotenv())
 
-Outh=os.getenv('outH')
-token=os.getenv('token')
-
 DEFAULT_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
-DEFAULT_CREDS_FILE = Outh  # скачиваете из GCP (OAuth Client ID → Desktop App)
-DEFAULT_TOKEN_FILE = token
+DEFAULT_CREDS_FILE = os.getenv('outH') or "/home/botuser/molodoy_mislitel1/creds/oauth.json"
+DEFAULT_TOKEN_FILE = os.getenv('token') or "/home/botuser/molodoy_mislitel1/creds/token.json"
 
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 
@@ -38,7 +35,7 @@ if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
         creds.refresh(Request())
     else:
-        flow = InstalledAppFlow.from_client_secrets_file(Outh, SCOPES)
+        flow = InstalledAppFlow.from_client_secrets_file(DEFAULT_CREDS_FILE, SCOPES)
         creds = flow.run_local_server(port=0)
     with open("token.pickle", "wb") as token:
         pickle.dump(creds, token)
