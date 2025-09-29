@@ -54,6 +54,9 @@ def get_creds(
 
     creds: Optional[UserCreds] = None
 
+    if os.path.exists(token_file):
+        creds = Credentials.from_authorized_user_file(token_file, scopes)
+
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
