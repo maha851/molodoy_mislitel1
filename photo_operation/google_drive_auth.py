@@ -14,13 +14,12 @@ from google.auth.transport.requests import Request
 
 load_dotenv(find_dotenv())
 
-Outh=os.getenv('Outh')
+Outh=os.getenv('outH')
 token=os.getenv('token')
 
 DEFAULT_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
-DEFAULT_CREDS_FILE = os.getenv(Outh) or "/home/botuser/molodoy_mislitel1/creds/oauth.json"
-DEFAULT_TOKEN_FILE = os.getenv(token)  or "/home/botuser/molodoy_mislitel1/creds/token.json"
-       # создастся автоматически после 1-го входа
+DEFAULT_CREDS_FILE = Outh  # скачиваете из GCP (OAuth Client ID → Desktop App)
+DEFAULT_TOKEN_FILE = token        # создастся автоматически после 1-го входа
 
 RUN_ON_SERVER = os.getenv("RUN_ON_SERVER", "0").lower() in ("1", "true")
 
@@ -43,8 +42,6 @@ def get_creds(
     Возвращает валидные OAuth-учётные данные (Credentials).
     Если token_file существует — подхватывает; иначе запускает браузер для логина.
     """
-    creds_file = DEFAULT_CREDS_FILE
-    token_file = DEFAULT_TOKEN_FILE
     scopes = list(scopes or DEFAULT_SCOPES)
 
     if not isinstance(token_file, str) or not token_file:
