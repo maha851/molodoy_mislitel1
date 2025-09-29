@@ -3,16 +3,20 @@ from __future__ import annotations
 import os
 from typing import Iterable, Optional
 
+from dotenv import find_dotenv, load_dotenv
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-from database.database import Outh
+load_dotenv(find_dotenv())
+
+Outh=os.getenv('Outh')
+token=os.getenv('token')
 
 DEFAULT_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 DEFAULT_CREDS_FILE = Outh  # скачиваете из GCP (OAuth Client ID → Desktop App)
-DEFAULT_TOKEN_FILE = "token.json"        # создастся автоматически после 1-го входа
+DEFAULT_TOKEN_FILE = token        # создастся автоматически после 1-го входа
 
 
 def get_creds(
