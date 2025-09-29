@@ -20,8 +20,8 @@ token=os.getenv('token')
 DEFAULT_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 # DEFAULT_CREDS_FILE = Outh  # скачиваете из GCP (OAuth Client ID → Desktop App)
 # DEFAULT_TOKEN_FILE = token
-DEFAULT_CREDS_FILE = os.getenv(Outh) or "/home/botuser/molodoy_mislitel1/creds/oauth.json"
-DEFAULT_TOKEN_FILE = os.getenv(token) or "/home/botuser/molodoy_mislitel1/creds/token.json"
+DEFAULT_CREDS_FILE = os.getenv('outH') or "/home/botuser/molodoy_mislitel1/creds/oauth.json"
+DEFAULT_TOKEN_FILE = os.getenv('token') or "/home/botuser/molodoy_mislitel1/creds/token.json"
 # создастся автоматически после 1-го входа
 
 RUN_ON_SERVER = os.getenv("RUN_ON_SERVER", "0").lower() in ("1", "true")
