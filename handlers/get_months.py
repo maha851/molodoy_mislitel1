@@ -21,7 +21,7 @@ MONTHS = [
 BTN_DONE     = "✅ Готово"
 BTN_CLEAR    = "🗑 Очистить"
 BTN_CANCEL   = "❌ Отмена"
-CANCEL_ALIASES = {"❌ Отмена", "отмена"}
+CANCEL_ALIASES = {"❌ отмена", "отмена"}
 
 VARIATION_SELECTOR = "\ufe0f"
 
@@ -67,15 +67,19 @@ async def start_months(message: types.Message, state: FSMContext):
     await state.set_state(Form.waiting_for_month)
 
 # ----- Обработка нажатий на кнопки во время выбора -----
+
+
+@photo_router.message(F.text.func(lambda t: norm(t) in CANCEL_ALIASES))
+async def cancel_anywhere(message: types.Message, state: FSMContext):
+    await message.answer("Отменено.", reply_markup=ReplyKeyboardRemove())
+    await state.clear()
+
 @photo_router.message(Form.waiting_for_month)
 async def handle_choice(message: types.Message, state: FSMContext):
-    raw = message.text or ""
-    # text = (message.text or "").strip()
-
-    text = norm(raw)
+    text = (message.text or "").strip()
 
     # отмена
-    if text in CANCEL_ALIASES:
+    if text == BTN_CANCEL:
         await message.answer("Отменено.", reply_markup=ReplyKeyboardRemove())
         await state.clear()
         return
