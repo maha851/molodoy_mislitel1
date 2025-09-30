@@ -25,6 +25,7 @@ async def comand_start(message: types.Message):
     await message.answer(reply_markup=ReplyKeyboardRemove)
 
 
+
 @user_private_router.callback_query(lambda c: c.data == 'btn1')
 async def process_callback_button1(callback_query: types.CallbackQuery):
     keyboard = InlineKeyboardMarkup(
