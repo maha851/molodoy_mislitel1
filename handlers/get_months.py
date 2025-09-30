@@ -65,6 +65,7 @@ async def start_months(message: types.Message, state: FSMContext):
 @photo_router.message(Form.waiting_for_month)
 async def handle_choice(message: types.Message, state: FSMContext):
     text = (message.text or "").strip()
+    await message.answer(BTN_CANCEL)
 
     # отмена
     if text == BTN_CANCEL:
