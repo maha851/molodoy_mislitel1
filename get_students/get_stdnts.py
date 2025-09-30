@@ -39,7 +39,7 @@ def keyboard_from_students(frist_leters):
             builder.add(KeyboardButton(text=name))
 
     # Добавляем кнопку отмены
-    builder.add(KeyboardButton(text="❌ Отмена"))
+    builder.add(KeyboardButton(text="ОТМЕНА"))
 
     # Форматируем в сетку 2 колонки
     builder.adjust(2)
