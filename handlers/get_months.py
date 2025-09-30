@@ -66,8 +66,8 @@ async def handle_choice(message: types.Message, state: FSMContext):
 
     # отмена
     if text == BTN_CANCEL:
-        await state.clear()
         await message.answer("Отменено.", reply_markup=ReplyKeyboardRemove())
+        await state.clear()
         return
 
     # очистить выбор
