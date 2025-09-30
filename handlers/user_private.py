@@ -9,6 +9,7 @@ user_private_router = Router()
 
 @user_private_router.message(CommandStart())
 async def comand_start(message: types.Message):
+    await message.answer("", reply_markup=ReplyKeyboardRemove())
     first_name = message.from_user.first_name  # имя
     last_name = message.from_user.last_name  # фамилия (может быть None)
     username = message.from_user.username
