@@ -12,7 +12,7 @@ async def comand_start(message: types.Message):
     first_name = message.from_user.first_name  # имя
     last_name = message.from_user.last_name  # фамилия (может быть None)
     username = message.from_user.username
-    await message.answer('',reply_markup=ReplyKeyboardRemove())
+    # await message.answer('',reply_markup=ReplyKeyboardRemove())
     keyboard = InlineKeyboardMarkup(
     inline_keyboard = [
         # Первый ряд кнопок
