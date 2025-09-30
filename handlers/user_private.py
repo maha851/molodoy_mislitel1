@@ -1,6 +1,6 @@
 from aiogram import F, types, Router
 from aiogram.filters import CommandStart, Command, or_f
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton,ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
@@ -22,6 +22,7 @@ async def comand_start(message: types.Message):
     Я — бот-помощник для учёта оплат за учеников курса «Молодой мыслитель» 📚
      Важно: я не проверяю факт оплаты — я только ставлю отметку ✅, потому что мы доверяем вам 🤝
      Нажмите кнопку ниже, чтобы посмотреть способы оплаты 💳👇''',reply_markup=keyboard)
+    await message.answer(reply_markup=ReplyKeyboardRemove)
 
 
 @user_private_router.callback_query(lambda c: c.data == 'btn1')

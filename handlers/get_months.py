@@ -21,6 +21,13 @@ MONTHS = [
 BTN_DONE     = "✅ Готово"
 BTN_CLEAR    = "🗑 Очистить"
 BTN_CANCEL   = "❌ Отмена"
+CANCEL_ALIASES = {"❌ Отмена", "отмена"}
+
+VARIATION_SELECTOR = "\ufe0f"
+
+def norm(s: str) -> str:
+    # убираем вариационные селекторы и лишние пробелы, понижаем регистр
+    return (s or "").replace(VARIATION_SELECTOR, "").strip().casefold()
 
 # ----- Клавиатура -----
 def months_reply_kb() -> ReplyKeyboardMarkup:
@@ -62,10 +69,13 @@ async def start_months(message: types.Message, state: FSMContext):
 # ----- Обработка нажатий на кнопки во время выбора -----
 @photo_router.message(Form.waiting_for_month)
 async def handle_choice(message: types.Message, state: FSMContext):
-    text = (message.text or "").strip()
+    raw = message.text or ""
+    # text = (message.text or "").strip()
+
+    text = norm(raw)
 
     # отмена
-    if text == BTN_CANCEL:
+    if text in CANCEL_ALIASES:
         await message.answer("Отменено.", reply_markup=ReplyKeyboardRemove())
         await state.clear()
         return
