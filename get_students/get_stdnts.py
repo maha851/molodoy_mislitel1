@@ -61,7 +61,7 @@ async def process_callback_button1(callback_query: types.CallbackQuery, state: F
     await state.set_state(Form.waiting_for_name_letters)
     await callback_query.message.answer('Введите первые три буквы имени вашего ученика:')
 
-@get_students_list_router.message(F.text == '❌ Отмена')
+@get_students_list_router.message(F.text == 'ОТМЕНА')
 def otmena(message: types.Message):
     message.answer('если хотите начать заного нажмите команду /start',reply_markup=ReplyKeyboardRemove())
 
