@@ -63,7 +63,7 @@ async def process_callback_button1(callback_query: types.CallbackQuery, state: F
 
 @get_students_list_router.message(F.text == '❌ Отмена')
 async def otmena(message: types.Message):
-    await message.answer('если хотите начать заного нажмите команду /start',reply_markup=ReplyKeyboardRemove())
+    await message.answer('Отменено\nесли хотите начать заного нажмите команду /start',reply_markup=ReplyKeyboardRemove())
 
 @get_students_list_router.message(Form.waiting_for_name_letters)
 async def process_name_letters(message: types.Message, state: FSMContext):
