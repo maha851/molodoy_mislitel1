@@ -51,7 +51,7 @@ async def process_callback_button1(callback_query: types.CallbackQuery):
 #     4)Выберите месяц(ы) за которые оплачиваете
 #     5)Прикрепите скрин или же pdf файл об оплате
 #       Всё!
-        await callback_query.message.answer('''Способы оплаты:
+    await callback_query.message.answer('''Способы оплаты:
  В рублях, на карту тинькофф: по номеру +7 978 870-59-26 (Эльмаз)
  В рублях, на карту Сбер: по номеру +7 978 870-59-26 (Эльмаз)
  В гривне, на карту Visa А-Банк (UAH): 4323 3870 1031 9187
@@ -65,5 +65,4 @@ async def process_callback_button1(callback_query: types.CallbackQuery):
     3)Выберите из выдачи своего ребёнка
     4)Выберите месяц(ы) за которые оплачиваете
     5)Прикрепите скрин или же pdf файл об оплате
-      Всё!'''
-,parse_mode='HTML',reply_markup=keyboard)
+      Всё!''',parse_mode='HTML',reply_markup=keyboard)
