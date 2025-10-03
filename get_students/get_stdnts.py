@@ -69,8 +69,8 @@ async def process_callback_button1(callback_query: types.CallbackQuery, state: F
 @get_students_list_router.message(F.text == '❌ Отмена')
 async def otmena(message: types.Message):
     sent = await message.answer('Отменено\nесли хотите начать заного нажмите команду /start',reply_markup=ReplyKeyboardRemove())
-    asyncio.create_task(delete_later(message, delay=10))
-    asyncio.create_task(delete_later(sent, delay=10))
+    asyncio.create_task(delete_later(message, delay=24 * 3600))
+    asyncio.create_task(delete_later(sent, delay=24 * 3600))
 
 
 @get_students_list_router.message(Form.waiting_for_name_letters)
@@ -89,8 +89,8 @@ async def process_name_letters(message: types.Message, state: FSMContext):
     Но если вы всё правильно ввели, то напишите  на Whatsapp {phone_number}
      или в родительскую группу, откуда вы попали сюда, и мы всё починим 🙂''')
         await state.set_state(None)
-    asyncio.create_task(delete_later(message, delay=10))
-    asyncio.create_task(delete_later(sent, delay=10))
+    asyncio.create_task(delete_later(message, delay=24 * 3600))
+    asyncio.create_task(delete_later(sent, delay=24 * 3600))
 
 
 
@@ -110,7 +110,7 @@ async def wait_photo(message: types.Message,state: FSMContext):
     for i in month:
         mark_payment(name,i.lower())
     await state.clear()
-    asyncio.create_task(delete_later(message, delay=10))
+    asyncio.create_task(delete_later(message, delay=24 * 3600))
 
 @get_students_list_router.message(F.document & (F.document.mime_type == "application/pdf"))
 async def upload_pdf(message: types.Message, bot,state: FSMContext):
@@ -129,5 +129,5 @@ async def upload_pdf(message: types.Message, bot,state: FSMContext):
     await message.answer(f"✅ оплата успешно прошла!")
     for i in month:
         mark_payment(name, i.lower())
-    asyncio.create_task(delete_later(message, delay=10))
+    asyncio.create_task(delete_later(message, delay=24 * 3600))
     await state.clear()
