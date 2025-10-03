@@ -59,11 +59,11 @@ class Form(StatesGroup):
 
 
 @get_students_list_router.callback_query(lambda c: c.data == 'btn2')
-async def process_callback_button1(message:Message,callback_query: types.CallbackQuery, state: FSMContext):
+async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.answer(f"bot type: {type(callback_query.message.bot)}",parse_mode=None)
     await state.set_state(Form.waiting_for_name_letters)
     await callback_query.message.answer('Наберите первые три буквы и''мени вашего ученика на кирилице и отправьте сюда,\nесли в семье учатся два ребёнка, их имена будут со знаком +')
-    asyncio.create_task(delete_later(message, delay=10))
+    asyncio.create_task(delete_later(callback_query.message, delay=10))
 
 @get_students_list_router.message(F.text == '❌ Отмена')
 async def otmena(message: types.Message):
