@@ -67,7 +67,7 @@ class Form(StatesGroup):
 @get_students_list_router.callback_query(lambda c: c.data == 'btn2')
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
     await state.set_state(Form.waiting_for_name_letters)
-    await callback_query.message.answer('Введите первые три буквы имени вашего ученика:')
+    await callback_query.message.answer('Наберите первые три буквы имени вашего ученика на кирилице и отправьте сюда,\nесли в семье учатся два ребёнка, их имена будут со знаком +')
 
 @get_students_list_router.message(F.text == '❌ Отмена')
 async def otmena(message: types.Message):
@@ -100,8 +100,7 @@ async def wait_photo(message: types.Message,state: FSMContext):
     buf, ext = download_telegram_file(TOKEN, file_id)
     filename = f"Оплата_от_{name} за {month}.{ext}"
     upload_to_google_drive(drive, buf, ext, FOLDER_ID,filename)
-    await message.answer('''✅ оплата успешно прошла!
-    ДжазакиЛлаха хайран за оплату! 🌟
+    await message.answer('''ДжазакиЛлаха хайран за оплату! 🌟
 Я ещё совсем молодой и могу ошибаться. Если что-то пошло не так, 
 напишите на Whatsapp +79788705926 или в родительскую группу, откуда вы попали сюда, и мы всё починим 🙂''')
     for i in month:
