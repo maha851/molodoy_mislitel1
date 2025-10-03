@@ -1,3 +1,4 @@
+import asyncio
 import os
 from fileinput import filename
 from io import BytesIO
@@ -5,7 +6,7 @@ from io import BytesIO
 from aiogram import Router, types, Bot, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import KeyboardButton, ReplyKeyboardRemove
+from aiogram.types import KeyboardButton, ReplyKeyboardRemove, Message
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from dotenv import load_dotenv, find_dotenv
 
@@ -44,6 +45,13 @@ def keyboard_from_students(frist_leters):
     # Форматируем в сетку 2 колонки
     builder.adjust(2)
     return builder.as_markup(resize_keyboard=True)
+
+async def delete_later(msg: Message, delay: float = 10):
+    try:
+        await asyncio.sleep(delay)
+        await msg.bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id)
+    except Exception:
+        pass
 
 
 get_students_list_router = Router()
