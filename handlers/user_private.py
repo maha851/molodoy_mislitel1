@@ -30,20 +30,6 @@ async def comand_start(message: types.Message):
      Нажмите кнопку ниже, чтобы посмотреть способы оплаты 💳👇''',reply_markup=keyboard)
     asyncio.create_task(delete_later(message, delay=10))
 
-
-
-
-
-@user_private_router.message(F.text == "/deltest")
-async def deltest(message: types.Message):
-    sent = await message.answer("Тест: это сообщение я попытаюсь удалить сразу")
-    try:
-        await message.bot.delete_message(sent.chat.id, sent.message_id)
-        await message.answer("✅ Удалилось сразу")
-    except TelegramBadRequest as e:
-        await message.answer(f"❌ Не смог удалить: {e!r}")
-    asyncio.create_task(delete_later(message, delay=10))
-
 @user_private_router.callback_query(lambda c: c.data == 'btn1')
 async def process_callback_button1(message:types.Message,callback_query: types.CallbackQuery):
     keyboard = InlineKeyboardMarkup(
