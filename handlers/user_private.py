@@ -31,7 +31,7 @@ async def comand_start(message: types.Message):
     asyncio.create_task(delete_later(message, delay=10))
 
 @user_private_router.callback_query(lambda c: c.data == 'btn1')
-async def process_callback_button1(message:types.Message,callback_query: types.CallbackQuery):
+async def process_callback_button1(callback_query: types.CallbackQuery):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             # Первый ряд кнопок
@@ -69,4 +69,4 @@ async def process_callback_button1(message:types.Message,callback_query: types.C
     4)Выберите месяц(ы) за которые оплачиваете
     5)Прикрепите скрин или же pdf файл об оплате
       Всё!''',parse_mode='HTML',reply_markup=keyboard)
-    asyncio.create_task(delete_later(message, delay=10))
+    asyncio.create_task(delete_later(callback_query.message, delay=10))
