@@ -34,7 +34,7 @@ async def main():
         auto_delete_delay=24 * 3600,  # как и было
     )
     dp = Dispatcher()
-    incoming_cleanup = IncomingAutoDeleteMiddleware(delay_seconds=24 * 3600,skip_commands=("/pin", "/keep"))
+    incoming_cleanup = IncomingAutoDeleteMiddleware(delay_seconds=10,skip_commands=("/pin", "/keep"))
     dp.message.middleware(incoming_cleanup)
     dp.callback_query.middleware(incoming_cleanup)
     dp.include_router(user_private_router)
