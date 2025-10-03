@@ -102,7 +102,7 @@ async def wait_photo(message: types.Message,state: FSMContext):
     file_id = message.photo[-1].file_id
     buf, ext = download_telegram_file(TOKEN, file_id)
     filename = f"Оплата_от_{name} за {month}.{ext}"
-    filename1 = f"Вы оплатиле за {name} за {month}.{ext}"
+    filename1 = f"Вы оплатиле за {name} за {month}"
     upload_to_google_drive(drive, buf, ext, FOLDER_ID,filename)
     await message.answer(f'''ДжазакиЛлаха хайран за оплату! 🌟{filename1}
 Я ещё совсем молодой и могу ошибаться. Если что-то пошло не так, 
@@ -110,6 +110,7 @@ async def wait_photo(message: types.Message,state: FSMContext):
     for i in month:
         mark_payment(name,i.lower())
     await state.clear()
+    asyncio.create_task(delete_later(message, delay=10))
 
 @get_students_list_router.message(F.document & (F.document.mime_type == "application/pdf"))
 async def upload_pdf(message: types.Message, bot,state: FSMContext):
