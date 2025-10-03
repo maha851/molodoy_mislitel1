@@ -27,6 +27,11 @@ async def comand_start(message: types.Message):
 
 
 
+@user_private_router.message(F.text == "/plain")
+async def plain(m: types.Message):
+    await m.answer("Обычный ответ без кнопок — должен исчезнуть через 10 секунд")
+
+
 @user_private_router.callback_query(lambda c: c.data == 'btn1')
 async def process_callback_button1(callback_query: types.CallbackQuery):
     keyboard = InlineKeyboardMarkup(
