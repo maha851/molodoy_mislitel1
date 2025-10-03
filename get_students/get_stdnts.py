@@ -60,32 +60,37 @@ class Form(StatesGroup):
 
 @get_students_list_router.callback_query(lambda c: c.data == 'btn2')
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
-    await callback_query.message.answer(f"bot type: {type(callback_query.message.bot)}",parse_mode=None)
     await state.set_state(Form.waiting_for_name_letters)
     sent = await callback_query.message.answer('Наберите первые три буквы и''мени вашего ученика на кирилице и отправьте сюда,\nесли в семье учатся два ребёнка, их имена будут со знаком +')
+    asyncio.create_task(delete_later(callback_query.message, delay=10))
     asyncio.create_task(delete_later(sent, delay=10))
+
 
 @get_students_list_router.message(F.text == '❌ Отмена')
 async def otmena(message: types.Message):
-    await message.answer('Отменено\nесли хотите начать заного нажмите команду /start',reply_markup=ReplyKeyboardRemove())
+    sent = await message.answer('Отменено\nесли хотите начать заного нажмите команду /start',reply_markup=ReplyKeyboardRemove())
     asyncio.create_task(delete_later(message, delay=10))
+    asyncio.create_task(delete_later(sent, delay=10))
+
 
 @get_students_list_router.message(Form.waiting_for_name_letters)
 async def process_name_letters(message: types.Message, state: FSMContext):
     user_input = message.text.strip()
+    sent = None
     if len(user_input) == 3 and proverka(user_input):
         await state.set_state(Form.waiting_for_child)
         keyboard = keyboard_from_students(user_input)
-        await message.answer('выберите вашего ученика:', reply_markup=keyboard)
+        sent = await message.answer('выберите вашего ученика:', reply_markup=keyboard)
     elif len(user_input) != 3:
-        await message.answer('длинна введённого сообщения не равняется трём')
+        sent = await message.answer('длинна введённого сообщения не равняется трём')
     elif not proverka(user_input):
-        await message.answer(f'''Ученика, имя которого начинается на {user_input} нету в списках учеников.
+        sent = await message.answer(f'''Ученика, имя которого начинается на {user_input} нету в списках учеников.
     Если вы неправильно ввели первые три буквы имени вашего ученика,нажмите /start чтобы начать процесс оплаты заново.
     Но если вы всё правильно ввели, то напишите  на Whatsapp {phone_number}
      или в родительскую группу, откуда вы попали сюда, и мы всё починим 🙂''')
-        asyncio.create_task(delete_later(message, delay=10))
         await state.set_state(None)
+    asyncio.create_task(delete_later(message, delay=10))
+    asyncio.create_task(delete_later(sent, delay=10))
 
 
 

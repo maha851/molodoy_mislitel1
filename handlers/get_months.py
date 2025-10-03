@@ -57,12 +57,13 @@ async def start_months(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
     name = message.text
     await state.update_data(selected=[])
-    await message.answer(
+    sent = await message.answer(
         "Выберите месяц(ы) для оплаты. Нажимайте по одному. Когда закончите — «✅ Готово».",
         reply_markup=months_reply_kb()
     )
-    asyncio.create_task(delete_later(message, delay=10))
     await state.set_state(Form.waiting_for_month)
+    asyncio.create_task(delete_later(message, delay=10))
+    asyncio.create_task(delete_later(sent, delay=10))
 
 # ----- Обработка нажатий на кнопки во время выбора -----
 @photo_router.message(Form.waiting_for_month)
@@ -71,14 +72,18 @@ async def handle_choice(message: types.Message, state: FSMContext):
 
     # отмена
     if text == BTN_CANCEL:
-        await message.answer("Отменено.", reply_markup=ReplyKeyboardRemove())
+        sent = await message.answer("Отменено.", reply_markup=ReplyKeyboardRemove())
         await state.clear()
+        asyncio.create_task(delete_later(message, delay=10))
+        asyncio.create_task(delete_later(sent, delay=10))
         return
 
     # очистить выбор
     if text == BTN_CLEAR:
         await state.update_data(selected=[])
-        await message.answer("Список очищен. Выбирайте заново.")
+        sent = await message.answer("Список очищен. Выбирайте заново.")
+        asyncio.create_task(delete_later(message, delay=10))
+        asyncio.create_task(delete_later(sent, delay=10))
         return
 
     # завершить выбор
@@ -86,14 +91,18 @@ async def handle_choice(message: types.Message, state: FSMContext):
         data = await state.get_data()
         selected = data.get("selected", [])
         if not selected:
-            await message.answer("❗ Нужен хотя бы один месяц.")
+            sent = await message.answer("❗ Нужен хотя бы один месяц.")
+            asyncio.create_task(delete_later(message, delay=10))
+            asyncio.create_task(delete_later(sent, delay=10))
             return
         # НЕ очищаем state здесь — чтобы следующие хендлеры (фото/PDF) могли взять месяцы
-        await message.answer(
+        sent = await message.answer(
             f"Вы выбрали: {', '.join(selected)}.\nТеперь отправьте фото или PDF с оплатой 📎",
             reply_markup=ReplyKeyboardRemove()
         )
         await state.set_state(Form.waiting_for_photo)
+        asyncio.create_task(delete_later(message, delay=10))
+        asyncio.create_task(delete_later(sent, delay=10))
         return
 
     # выбор месяца (тоггл)
@@ -113,9 +122,10 @@ async def handle_choice(message: types.Message, state: FSMContext):
         await state.update_data(selected=selected_sorted)
 
         pretty = ", ".join(selected_sorted) if selected_sorted else "пока пусто"
-        await message.answer(f"{msg}\nТекущий выбор: {pretty}\nКогда закончите — нажмите «{BTN_DONE}».")
+        sent = await message.answer(f"{msg}\nТекущий выбор: {pretty}\nКогда закончите — нажмите «{BTN_DONE}».")
+        asyncio.create_task(delete_later(message, delay=10))
+        asyncio.create_task(delete_later(sent, delay=10))
         return
 
     # любое другое сообщение
     await message.answer("Пожалуйста, выберите месяц(ы) с клавиатуры или нажмите «✅ Готово».")
-    asyncio.create_task(delete_later(message, delay=10))
