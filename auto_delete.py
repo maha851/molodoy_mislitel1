@@ -10,8 +10,9 @@ async def _delete_after(bot: Bot, chat_id: int, message_id: int, delay: int):
     try:
         await asyncio.sleep(delay)
         await bot.delete_message(chat_id, message_id)
-    except Exception:
-        pass  # уже удалено / старше 48ч / нет прав
+        print(f"[auto_delete] deleted chat={chat_id} mid={message_id} after {delay}s")
+    except Exception as e:
+        print(f"[auto_delete] FAILED chat={chat_id} mid={message_id}: {e!r}")
 
 
 class IncomingAutoDeleteMiddleware(BaseMiddleware):
