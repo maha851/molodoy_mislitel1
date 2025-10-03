@@ -2,6 +2,7 @@ import asyncio
 import os
 
 from aiogram import Bot, Dispatcher, types
+from aiogram.client.default import DefaultBotProperties
 from dotenv import find_dotenv, load_dotenv
 
 from auto_delete import AutoDeleteBot, IncomingAutoDeleteMiddleware
@@ -25,7 +26,13 @@ dp.include_router(photo_router)
 
 
 async def main():
-    bot = AutoDeleteBot(os.getenv('TOKEN'), parse_mode="HTML", auto_delete_delay=24 * 3600)
+    default_props = DefaultBotProperties(parse_mode="HTML")  # <— НОВОЕ
+
+    bot = AutoDeleteBot(
+        os.getenv("TOKEN"),
+        default=default_props,  # <— вместо parse_mode=...
+        auto_delete_delay=24 * 3600,  # как и было
+    )
     dp = Dispatcher()
     incoming_cleanup = IncomingAutoDeleteMiddleware(delay_seconds=24 * 3600,skip_commands=("/pin", "/keep"))
     dp.message.middleware(incoming_cleanup)
