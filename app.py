@@ -31,7 +31,7 @@ async def main():
     bot = AutoDeleteBot(
         os.getenv("TOKEN"),
         default=default_props,  # <— вместо parse_mode=...
-        auto_delete_delay=24 * 3600,  # как и было
+        auto_delete_delay=10,  # как и было
     )
     dp = Dispatcher()
     incoming_cleanup = IncomingAutoDeleteMiddleware(delay_seconds=10,skip_commands=("/pin", "/keep"))
