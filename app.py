@@ -14,15 +14,15 @@ from get_students.get_stdnts import get_students_list_router
 load_dotenv(find_dotenv())
 
 
-bot = Bot(token=os.getenv('TOKEN'))
+# bot = Bot(token=os.getenv('TOKEN'))
+#
+#
+# dp = Dispatcher()
 
-
-dp = Dispatcher()
-
-dp.include_router(user_private_router)
-dp.include_router(router)
-dp.include_router(get_students_list_router)
-dp.include_router(photo_router)
+# dp.include_router(user_private_router)
+# dp.include_router(router)
+# dp.include_router(get_students_list_router)
+# dp.include_router(photo_router)
 
 
 async def main():
@@ -37,6 +37,10 @@ async def main():
     incoming_cleanup = IncomingAutoDeleteMiddleware(delay_seconds=24 * 3600,skip_commands=("/pin", "/keep"))
     dp.message.middleware(incoming_cleanup)
     dp.callback_query.middleware(incoming_cleanup)
+    dp.include_router(user_private_router)
+    dp.include_router(router)
+    dp.include_router(get_students_list_router)
+    dp.include_router(photo_router)
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_my_commands(commands=private, scope=types.BotCommandScopeAllPrivateChats())
     await dp.start_polling(bot)
