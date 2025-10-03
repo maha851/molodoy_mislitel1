@@ -9,7 +9,7 @@ from aiogram.fsm.context import FSMContext
 from app import delete_later
 from get_students.get_stdnts import Form
 
-photo_router  = Router()
+photo_router = Router()
 
 # ----- FSM -----
 
