@@ -66,7 +66,7 @@ class Form(StatesGroup):
 
 @get_students_list_router.callback_query(lambda c: c.data == 'btn2')
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
-    await callback_query.message.answer(f"bot type: {type(callback_query.message.bot)}")
+    await callback_query.message.answer(f"bot type: {type(callback_query.message.bot)}",parse_mode=None)
     await state.set_state(Form.waiting_for_name_letters)
     await callback_query.message.answer('Наберите первые три буквы имени вашего ученика на кирилице и отправьте сюда,\nесли в семье учатся два ребёнка, их имена будут со знаком +')
 
