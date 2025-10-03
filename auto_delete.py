@@ -1,21 +1,19 @@
 # utils/auto_delete.py
 import asyncio
-from typing import Any, Callable, Awaitable, Optional, Iterable, Dict
+from typing import Any, Callable, Awaitable, Optional, Iterable, Dict, List
 
 from aiogram import BaseMiddleware, Bot
 from aiogram.types import Message, CallbackQuery
 
-# --- базовая утилита удаления c запасом на 48 часов ---
+
 async def _delete_after(bot: Bot, chat_id: int, message_id: int, delay: int):
     try:
         await asyncio.sleep(delay)
         await bot.delete_message(chat_id, message_id)
     except Exception:
-        # игнорируем: слишком старое, уже удалено, нет прав и т.д.
-        pass
+        pass  # уже удалено / старше 48ч / нет прав
 
 
-# --- Middleware для входящих событий ---
 class IncomingAutoDeleteMiddleware(BaseMiddleware):
     def __init__(self, delay_seconds: int = 24 * 3600,
                  skip_commands: Optional[Iterable[str]] = ("/pin", "/keep")):
@@ -31,42 +29,42 @@ class IncomingAutoDeleteMiddleware(BaseMiddleware):
     ) -> Any:
         bot: Bot = data["bot"]
 
-        # 1) Обычные сообщения пользователя
+        # 1) Сообщения пользователя
         if isinstance(event, Message):
             text = (event.text or "").strip()
             if not any(text.startswith(cmd) for cmd in self.skip_commands):
                 asyncio.create_task(_delete_after(bot, event.chat.id, event.message_id, self.delay))
 
-        # 2) CallbackQuery — удаляем "карточку" с кнопками
+        # 2) CallbackQuery — удаляем "карточку" (сообщение с инлайн-кнопками)
         if isinstance(event, CallbackQuery) and event.message:
             asyncio.create_task(_delete_after(bot, event.message.chat.id, event.message.message_id, self.delay))
 
         return await handler(event, data)
 
 
-# --- Подкласс Bot, который сам чистит все исходящие сообщения ---
 class AutoDeleteBot(Bot):
     def __init__(self, *args, auto_delete_delay: int = 24 * 3600, **kwargs):
         super().__init__(*args, **kwargs)
         self._auto_delete_delay = auto_delete_delay
 
-    # Универсальный помощник
     async def _ad(self, method_coro):
         """
-        Запускает оригинальный метод Bot, затем, если вернулся Message,
-        планирует его удаление.
+        Выполняет метод бота; если результат — Message или список Message,
+        планирует удаление.
         """
         res = await method_coro
-        # Многие send_* возвращают Message. Edit-методы возвращают Message либо bool.
         try:
             if isinstance(res, Message):
                 asyncio.create_task(_delete_after(self, res.chat.id, res.message_id, self._auto_delete_delay))
+            elif isinstance(res, list) and res and isinstance(res[0], Message):
+                # например, send_media_group возвращает список Message
+                for m in res:
+                    asyncio.create_task(_delete_after(self, m.chat.id, m.message_id, self._auto_delete_delay))
         except Exception:
             pass
         return res
 
-    # Переопределяем самые частые методы отправки.
-    # При необходимости добавишь сюда другие send_*/edit_*.
+    # --- send_* ---
     async def send_message(self, chat_id: int, text: str, **kwargs):
         return await self._ad(super().send_message(chat_id, text, **kwargs))
 
@@ -82,6 +80,16 @@ class AutoDeleteBot(Bot):
     async def send_audio(self, chat_id: int, audio, **kwargs):
         return await self._ad(super().send_audio(chat_id, audio, **kwargs))
 
+    async def send_animation(self, chat_id: int, animation, **kwargs):
+        return await self._ad(super().send_animation(chat_id, animation, **kwargs))
+
+    async def send_sticker(self, chat_id: int, sticker, **kwargs):
+        return await self._ad(super().send_sticker(chat_id, sticker, **kwargs))
+
+    async def send_media_group(self, chat_id: int, media: List, **kwargs):
+        return await self._ad(super().send_media_group(chat_id, media, **kwargs))
+
+    # --- edit_* ---
     async def edit_message_text(self, text: str, chat_id: Optional[int] = None,
                                 message_id: Optional[int] = None, **kwargs):
         return await self._ad(super().edit_message_text(text=text, chat_id=chat_id, message_id=message_id, **kwargs))
@@ -89,3 +97,19 @@ class AutoDeleteBot(Bot):
     async def edit_message_caption(self, chat_id: Optional[int] = None,
                                    message_id: Optional[int] = None, **kwargs):
         return await self._ad(super().edit_message_caption(chat_id=chat_id, message_id=message_id, **kwargs))
+
+    async def edit_message_media(self, media, chat_id: Optional[int] = None,
+                                 message_id: Optional[int] = None, **kwargs):
+        return await self._ad(super().edit_message_media(media=media, chat_id=chat_id, message_id=message_id, **kwargs))
+
+    async def edit_message_reply_markup(self, chat_id: Optional[int] = None,
+                                        message_id: Optional[int] = None, **kwargs):
+        # Иногда Telegram возвращает True/False. Если вернёт Message — тоже удалим.
+        return await self._ad(super().edit_message_reply_markup(chat_id=chat_id, message_id=message_id, **kwargs))
+
+    # --- copy/forward ---
+    async def copy_message(self, chat_id: int, from_chat_id: int, message_id: int, **kwargs):
+        return await self._ad(super().copy_message(chat_id, from_chat_id, message_id, **kwargs))
+
+    async def forward_message(self, chat_id: int, from_chat_id: int, message_id: int, **kwargs):
+        return await self._ad(super().forward_message(chat_id, from_chat_id, message_id, **kwargs))
