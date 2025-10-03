@@ -6,7 +6,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
-from app import delete_later
+from common.bot_comands_list import delete_later
 from get_students.get_stdnts import Form
 
 photo_router = Router()

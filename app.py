@@ -10,15 +10,9 @@ from handlers.user_private import user_private_router
 from database.database import router
 from common.bot_comands_list  import private
 from get_students.get_stdnts import get_students_list_router
+
+
 load_dotenv(find_dotenv())
-
-async def delete_later(msg: Message, delay: float = 10):
-    try:
-        await asyncio.sleep(delay)
-        await msg.bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id)
-    except Exception:
-        pass
-
 
 bot = Bot(token=os.getenv('TOKEN'))
 

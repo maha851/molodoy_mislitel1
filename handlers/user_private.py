@@ -6,7 +6,7 @@ from aiogram.filters import CommandStart, Command, or_f
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton,ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-from app import delete_later
+from common.bot_comands_list import delete_later
 
 user_private_router = Router()
 

@@ -11,7 +11,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from dotenv import load_dotenv, find_dotenv
 from google.auth import message
 
-from app import delete_later
+from common.bot_comands_list import delete_later
 from database.database import data_names
 from database.database import mark_payment
 from photo_operation.google_drive_auth import get_drive
