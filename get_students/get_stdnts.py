@@ -62,8 +62,8 @@ class Form(StatesGroup):
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
     await state.set_state(Form.waiting_for_name_letters)
     sent = await callback_query.message.answer('Наберите первые три буквы и''мени вашего ученика на кирилице и отправьте сюда,\nесли в семье учатся два ребёнка, их имена будут со знаком +')
-    asyncio.create_task(delete_later(callback_query.message, delay=10))
-    asyncio.create_task(delete_later(sent, delay=10))
+    asyncio.create_task(delete_later(callback_query.message, delay=24 * 3600))
+    asyncio.create_task(delete_later(sent, delay=24 * 3600))
 
 
 @get_students_list_router.message(F.text == '❌ Отмена')
