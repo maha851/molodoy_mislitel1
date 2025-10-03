@@ -1,9 +1,12 @@
 # aiogram 3.x
+import asyncio
+
 from aiogram import Router, F, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
+from app import delete_later
 from get_students.get_stdnts import Form
 
 photo_router  = Router()
@@ -58,7 +61,7 @@ async def start_months(message: types.Message, state: FSMContext):
         "Выберите месяц(ы) для оплаты. Нажимайте по одному. Когда закончите — «✅ Готово».",
         reply_markup=months_reply_kb()
     )
-
+    asyncio.create_task(delete_later(message, delay=10))
     await state.set_state(Form.waiting_for_month)
 
 # ----- Обработка нажатий на кнопки во время выбора -----
@@ -115,3 +118,4 @@ async def handle_choice(message: types.Message, state: FSMContext):
 
     # любое другое сообщение
     await message.answer("Пожалуйста, выберите месяц(ы) с клавиатуры или нажмите «✅ Готово».")
+    asyncio.create_task(delete_later(message, delay=10))

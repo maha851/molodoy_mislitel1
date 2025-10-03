@@ -9,7 +9,9 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import KeyboardButton, ReplyKeyboardRemove, Message
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from dotenv import load_dotenv, find_dotenv
+from google.auth import message
 
+from app import delete_later
 from database.database import data_names
 from database.database import mark_payment
 from photo_operation.google_drive_auth import get_drive
@@ -46,13 +48,6 @@ def keyboard_from_students(frist_leters):
     builder.adjust(2)
     return builder.as_markup(resize_keyboard=True)
 
-async def delete_later(msg: Message, delay: float = 10):
-    try:
-        await asyncio.sleep(delay)
-        await msg.bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id)
-    except Exception:
-        pass
-
 
 get_students_list_router = Router()
 
@@ -65,14 +60,16 @@ class Form(StatesGroup):
 
 
 @get_students_list_router.callback_query(lambda c: c.data == 'btn2')
-async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
+async def process_callback_button1(message:Message,callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.answer(f"bot type: {type(callback_query.message.bot)}",parse_mode=None)
     await state.set_state(Form.waiting_for_name_letters)
-    await callback_query.message.answer('Наберите первые три буквы имени вашего ученика на кирилице и отправьте сюда,\nесли в семье учатся два ребёнка, их имена будут со знаком +')
+    await callback_query.message.answer('Наберите первые три буквы и''мени вашего ученика на кирилице и отправьте сюда,\nесли в семье учатся два ребёнка, их имена будут со знаком +')
+    asyncio.create_task(delete_later(message, delay=10))
 
 @get_students_list_router.message(F.text == '❌ Отмена')
 async def otmena(message: types.Message):
     await message.answer('Отменено\nесли хотите начать заного нажмите команду /start',reply_markup=ReplyKeyboardRemove())
+    asyncio.create_task(delete_later(message, delay=10))
 
 @get_students_list_router.message(Form.waiting_for_name_letters)
 async def process_name_letters(message: types.Message, state: FSMContext):
@@ -88,6 +85,7 @@ async def process_name_letters(message: types.Message, state: FSMContext):
     Если вы неправильно ввели первые три буквы имени вашего ученика,нажмите /start чтобы начать процесс оплаты заново.
     Но если вы всё правильно ввели, то напишите  на Whatsapp {phone_number}
      или в родительскую группу, откуда вы попали сюда, и мы всё починим 🙂''')
+        asyncio.create_task(delete_later(message, delay=10))
         await state.set_state(None)
 
 
@@ -106,6 +104,7 @@ async def wait_photo(message: types.Message,state: FSMContext):
 напишите на Whatsapp +79788705926 или в родительскую группу, откуда вы попали сюда, и мы всё починим 🙂''')
     for i in month:
         mark_payment(name,i.lower())
+    asyncio.create_task(delete_later(message, delay=10))
     await state.clear()
 
 @get_students_list_router.message(F.document & (F.document.mime_type == "application/pdf"))
@@ -125,5 +124,5 @@ async def upload_pdf(message: types.Message, bot,state: FSMContext):
     await message.answer(f"✅ оплата успешно прошла!")
     for i in month:
         mark_payment(name, i.lower())
-
+    asyncio.create_task(delete_later(message, delay=10))
     await state.clear()

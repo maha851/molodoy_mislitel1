@@ -1,9 +1,12 @@
+import asyncio
+
 from aiogram import F, types, Router
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart, Command, or_f
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton,ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
+from app import delete_later
 
 user_private_router = Router()
 
@@ -25,23 +28,24 @@ async def comand_start(message: types.Message):
     Я — бот-помощник для учёта оплат за учеников курса «Молодой мыслитель» 📚
      Важно: я не проверяю факт оплаты — я только ставлю отметку ✅, потому что мы доверяем вам 🤝
      Нажмите кнопку ниже, чтобы посмотреть способы оплаты 💳👇''',reply_markup=keyboard)
+    asyncio.create_task(delete_later(message, delay=10))
 
 
 
 
 
 @user_private_router.message(F.text == "/deltest")
-async def deltest(m: types.Message):
-    sent = await m.answer("Тест: это сообщение я попытаюсь удалить сразу")
+async def deltest(message: types.Message):
+    sent = await message.answer("Тест: это сообщение я попытаюсь удалить сразу")
     try:
-        await m.bot.delete_message(sent.chat.id, sent.message_id)
-        await m.answer("✅ Удалилось сразу")
+        await message.bot.delete_message(sent.chat.id, sent.message_id)
+        await message.answer("✅ Удалилось сразу")
     except TelegramBadRequest as e:
-        await m.answer(f"❌ Не смог удалить: {e!r}")
-
+        await message.answer(f"❌ Не смог удалить: {e!r}")
+    asyncio.create_task(delete_later(message, delay=10))
 
 @user_private_router.callback_query(lambda c: c.data == 'btn1')
-async def process_callback_button1(callback_query: types.CallbackQuery):
+async def process_callback_button1(message:types.Message,callback_query: types.CallbackQuery):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             # Первый ряд кнопок
@@ -79,3 +83,4 @@ async def process_callback_button1(callback_query: types.CallbackQuery):
     4)Выберите месяц(ы) за которые оплачиваете
     5)Прикрепите скрин или же pdf файл об оплате
       Всё!''',parse_mode='HTML',reply_markup=keyboard)
+    asyncio.create_task(delete_later(message, delay=10))
