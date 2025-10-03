@@ -1,4 +1,5 @@
 from aiogram import F, types, Router
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart, Command, or_f
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton,ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
@@ -27,9 +28,16 @@ async def comand_start(message: types.Message):
 
 
 
-@user_private_router.message(F.text == "/plain")
-async def plain(m: types.Message):
-    await m.answer("Обычный ответ без кнопок — должен исчезнуть через 10 секунд")
+
+
+@user_private_router.message(F.text == "/deltest")
+async def deltest(m: types.Message):
+    sent = await m.answer("Тест: это сообщение я попытаюсь удалить сразу")
+    try:
+        await m.bot.delete_message(sent.chat.id, sent.message_id)
+        await m.answer("✅ Удалилось сразу")
+    except TelegramBadRequest as e:
+        await m.answer(f"❌ Не смог удалить: {e!r}")
 
 
 @user_private_router.callback_query(lambda c: c.data == 'btn1')
