@@ -62,8 +62,8 @@ class Form(StatesGroup):
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.answer(f"bot type: {type(callback_query.message.bot)}",parse_mode=None)
     await state.set_state(Form.waiting_for_name_letters)
-    await callback_query.message.answer('Наберите первые три буквы и''мени вашего ученика на кирилице и отправьте сюда,\nесли в семье учатся два ребёнка, их имена будут со знаком +')
-    asyncio.create_task(delete_later(callback_query.message, delay=10))
+    sent = await callback_query.message.answer('Наберите первые три буквы и''мени вашего ученика на кирилице и отправьте сюда,\nесли в семье учатся два ребёнка, их имена будут со знаком +')
+    asyncio.create_task(delete_later(sent, delay=10))
 
 @get_students_list_router.message(F.text == '❌ Отмена')
 async def otmena(message: types.Message):
@@ -97,13 +97,13 @@ async def wait_photo(message: types.Message,state: FSMContext):
     file_id = message.photo[-1].file_id
     buf, ext = download_telegram_file(TOKEN, file_id)
     filename = f"Оплата_от_{name} за {month}.{ext}"
+    filename1 = f"Вы оплатиле за {name} за {month}.{ext}"
     upload_to_google_drive(drive, buf, ext, FOLDER_ID,filename)
-    await message.answer('''ДжазакиЛлаха хайран за оплату! 🌟
+    await message.answer(f'''ДжазакиЛлаха хайран за оплату! 🌟{filename1}
 Я ещё совсем молодой и могу ошибаться. Если что-то пошло не так, 
 напишите на Whatsapp +79788705926 или в родительскую группу, откуда вы попали сюда, и мы всё починим 🙂''')
     for i in month:
         mark_payment(name,i.lower())
-    asyncio.create_task(delete_later(message, delay=10))
     await state.clear()
 
 @get_students_list_router.message(F.document & (F.document.mime_type == "application/pdf"))

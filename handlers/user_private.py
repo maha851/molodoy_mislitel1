@@ -15,8 +15,6 @@ user_private_router = Router()
 async def comand_start(message: types.Message):
     await message.answer("\u2063", reply_markup=ReplyKeyboardRemove())
     first_name = message.from_user.first_name  # имя
-    last_name = message.from_user.last_name  # фамилия (может быть None)
-    username = message.from_user.username
     # await message.answer('',reply_markup=ReplyKeyboardRemove())
     keyboard = InlineKeyboardMarkup(
     inline_keyboard = [
