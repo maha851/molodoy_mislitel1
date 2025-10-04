@@ -41,7 +41,7 @@ data = read_sheet()
 
 data_names = []
 
-for i in data[1:len(data)//2]:
+for i in data[1:len(data)]:
     data_names.append(i[1])
 
 
