@@ -44,7 +44,7 @@ def keyboard_from_students(frist_leters):
     builder.add(KeyboardButton(text="❌ Отмена"))
 
     # Форматируем в сетку 2 колонки
-    builder.adjust(3)
+    builder.adjust(2)
     return builder.as_markup(resize_keyboard=True)
 
 
