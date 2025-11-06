@@ -37,13 +37,6 @@ def read_sheet(range_name="A1:D100"):
 
 router = Router()
 
-data = read_sheet()
-
-data_names = []
-
-for i in data[1:len(data)]:
-    data_names.append(i[1])
-
 
 def col_to_letters(n: int) -> str:
     """Преобразует номер столбца (1 -> A, 27 -> AA)"""

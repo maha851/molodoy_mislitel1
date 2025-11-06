@@ -11,7 +11,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from dotenv import load_dotenv, find_dotenv
 
 from common.bot_comands_list import delete_later
-from database.database import data_names
+from database.database import read_sheet
 from database.database import mark_payment
 from photo_operation.google_drive_auth import get_drive
 from photo_operation.operation_with_photo import download_telegram_file, upload_to_google_drive, drive
@@ -24,16 +24,17 @@ FOLDER_ID = '1ymw4Avo1HWhBrtYt_mlN4E6Is9KVFo2-'
 
 drive = get_drive()
 
-def proverka(frist_leters:str):
-    for name in data_names:
-        if frist_leters.lower() in name.lower():
-            return True
-    return False
 
 
 
 def keyboard_from_students(frist_leters):
     builder = ReplyKeyboardBuilder()
+    data = read_sheet()
+
+    data_names = []
+
+    for i in data[1:len(data)]:
+        data_names.append(i[1])
 
     # Добавляем кнопки с именами (по 2 в ряд)
     for name in data_names:
@@ -76,6 +77,18 @@ async def otmena(message: types.Message):
 @get_students_list_router.message(Form.waiting_for_name_letters)
 async def process_name_letters(message: types.Message, state: FSMContext):
     user_input = message.text.strip()
+    data = read_sheet()
+
+    data_names = []
+
+    for i in data[1:len(data)]:
+        data_names.append(i[1])
+
+    def proverka(frist_leters: str):
+        for name in data_names:
+            if frist_leters.lower() in name.lower():
+                return True
+        return False
     sent = None
     if len(user_input) == 3 and proverka(user_input):
         await state.set_state(Form.waiting_for_child)
