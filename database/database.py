@@ -26,7 +26,7 @@ SHEET_NAME = 'Ученики'
 
 
 
-def read_sheet(range_name="A1:D100"):
+def read_sheet(range_name="A1:Z1000"):
     result = service.spreadsheets().values().get(
         spreadsheetId=SPREADSHEET_ID,
         range=range_name
