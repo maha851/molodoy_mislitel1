@@ -14,8 +14,15 @@ import os, pickle
 from database.database import Outh
 from photo_operation.google_drive_auth import get_drive
 
-drive = get_drive()
+drive = None
 
+# def get_drive_instance():
+#     global drive
+#     if drive is None:
+#         drive = get_drive()
+#     return drive
+
+# drive = get_drive_instance()
 
 load_dotenv(find_dotenv())
 
