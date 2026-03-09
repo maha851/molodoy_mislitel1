@@ -24,10 +24,6 @@ dp.include_router(router)
 dp.include_router(get_students_list_router)
 dp.include_router(photo_router)
 
-@dp.message()
-async def test(message: Message):
-    print("MESSAGE RECEIVED")
-    await message.answer("бот работает")
 
 
 async def main():
