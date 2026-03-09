@@ -85,8 +85,8 @@ async def process_name_letters(message: types.Message, state: FSMContext):
 
     for i in data[0:len(data)]:
         data_names.append(i)
-        await massage.answer(data_names)
-        await massage.answer(data)
+        await message.answer(data_names)
+        await message.answer(data)
 
     def proverka(frist_leters: str):
         for name in data_names:
