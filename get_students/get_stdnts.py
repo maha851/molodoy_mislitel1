@@ -78,7 +78,8 @@ async def otmena(message: types.Message):
 async def process_name_letters(message: types.Message, state: FSMContext):
     user_input = message.text.strip()
     data = read_sheet()
-
+    await message.answer(data)
+    
     data_names = []
 
     for i in data[1:len(data)]:
