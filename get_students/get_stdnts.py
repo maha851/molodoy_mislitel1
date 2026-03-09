@@ -3,18 +3,22 @@ import os
 from fileinput import filename
 from io import BytesIO
 
-from aiogram import Router, types, Bot, F
+from aiogram import Bot, F, Router, types
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import KeyboardButton, ReplyKeyboardRemove, Message
+from aiogram.types import KeyboardButton, Message, ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
-from dotenv import load_dotenv, find_dotenv
+from dotenv import find_dotenv, load_dotenv
 
 from common.bot_comands_list import delete_later
-from database.database import read_sheet
-from database.database import mark_payment
+from database.database import mark_payment, read_sheet
 from photo_operation.google_drive_auth import get_drive
-from photo_operation.operation_with_photo import download_telegram_file, upload_to_google_drive, drive
+from photo_operation.operation_with_photo import (
+    download_telegram_file,
+    drive,
+    upload_to_google_drive,
+)
+
 load_dotenv(find_dotenv())
 
 phone_number = '+79788705926'
@@ -27,25 +31,34 @@ drive = get_drive()
 
 
 
-def keyboard_from_students(frist_leters):
+def keyboard_from_students(first_letters):
     builder = ReplyKeyboardBuilder()
     data = read_sheet()
 
+
     data_names = []
 
-    for i in data[1:len(data)]:
-        data_names.append(i[1])
+    for row in data[1:]:   # пропускаем заголовок
+        if len(row) < 2:
+            continue
 
-    # Добавляем кнопки с именами (по 2 в ряд)
+        student_id = row[0].strip()
+        name = row[1].strip()
+
+        # пропускаем разделы групп
+        if not student_id:
+            continue
+
+        data_names.append(name)
+
     for name in data_names:
-        if frist_leters.lower() in name.lower():
+        if first_letters.lower() in name.lower():
             builder.add(KeyboardButton(text=name))
 
-    # Добавляем кнопку отмены
     builder.add(KeyboardButton(text="❌ Отмена"))
 
-    # Форматируем в сетку 2 колонки
     builder.adjust(3)
+
     return builder.as_markup(resize_keyboard=True)
 
 
@@ -83,12 +96,10 @@ async def process_name_letters(message: types.Message, state: FSMContext):
 
     for i in data[1:len(data)]:
         data_names.append(i)
-        await message.answer(data_names)
-        await message.answer(data)
 
     def proverka(frist_leters: str):
         for name in data_names:
-            if frist_leters.lower() in name.lower():
+            if frist_leters.lower() in str(name).lower():
                 return True
         return False
     sent = None
@@ -120,14 +131,14 @@ async def wait_photo(message: types.Message,state: FSMContext):
     filename1 = f"Вы оплатиле за {name} за {month}"
     upload_to_google_drive(drive, buf, ext, FOLDER_ID,filename)
     await message.answer(f'''ДжазакиЛлаха хайран за оплату! 🌟{filename1}
-Я ещё совсем молодой и могу ошибаться. Если что-то пошло не так, 
+Я ещё совсем молодой и могу ошибаться. Если что-то пошло не так,
 напишите на Whatsapp +79788705926 или в родительскую группу, откуда вы попали сюда, и мы всё починим 🙂''')
     for i in month:
         mark_payment(name,i.lower())
     await state.clear()
     asyncio.create_task(delete_later(message, delay=24 * 3600))
 
-@get_students_list_router.message(F.document & (F.document.mime_type == "application/pdf"))
+@get_students_list_router.message(F.document & ((F.document.mime_type == "application/pdf") | (F.document.mime_type.startswith("image/"))))
 async def upload_pdf(message: types.Message, bot,state: FSMContext):
     data = await state.get_data()
     name = data["name"]
