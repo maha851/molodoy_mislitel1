@@ -12,7 +12,7 @@ from common.bot_comands_list  import private
 from get_students.get_stdnts import get_students_list_router
 
 
-load_dotenv(find_dotenv())
+load_dotenv(".env")
 
 bot = Bot(token=os.getenv('TOKEN'))
 
