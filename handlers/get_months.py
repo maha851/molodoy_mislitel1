@@ -100,7 +100,6 @@ async def handle_choice(message: types.Message, state: FSMContext):
             f"Вы выбрали: {', '.join(selected)}.\nТеперь отправьте фото или PDF с оплатой 📎",
             reply_markup=ReplyKeyboardRemove()
         )
-        print("STATE -> waiting_for_photo")
         await state.set_state(Form.waiting_for_photo)
         asyncio.create_task(delete_later(message, delay=24 * 3600))
         asyncio.create_task(delete_later(sent, delay=24 * 3600))
