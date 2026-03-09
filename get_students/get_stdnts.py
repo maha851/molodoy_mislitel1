@@ -79,7 +79,7 @@ async def process_name_letters(message: types.Message, state: FSMContext):
     user_input = message.text.strip()
     await message.answer(user_input)
     data = read_sheet()
-    await message.answer('sdad)
+    await message.answer('sdad')
 
     data_names = []
 
