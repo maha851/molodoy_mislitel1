@@ -77,9 +77,10 @@ async def otmena(message: types.Message):
 @get_students_list_router.message(Form.waiting_for_name_letters)
 async def process_name_letters(message: types.Message, state: FSMContext):
     user_input = message.text.strip()
+    await message.answer(user_input)
     data = read_sheet()
-    await message.answer(data)
-    
+    await message.answer('sdad)
+
     data_names = []
 
     for i in data[1:len(data)]:
