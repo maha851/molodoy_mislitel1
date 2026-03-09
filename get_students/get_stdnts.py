@@ -130,7 +130,8 @@ async def wait_photo(message: types.Message,state: FSMContext):
     filename = f"Оплата_от_{name} за {month}.{ext}"
     filename1 = f"Вы оплатиле за {name} за {month}"
     upload_to_google_drive(drive, buf, ext, FOLDER_ID,filename)
-    await message.answer(f'''ДжазакиЛлаха хайран за оплату! 🌟{filename1}
+    await message.answer(f'''ДжазакиЛлаха хайран за оплату! 
+🌟{filename1}
 Я ещё совсем молодой и могу ошибаться. Если что-то пошло не так,
 напишите на Whatsapp +79788705926 или в родительскую группу, откуда вы попали сюда, и мы всё починим 🙂''')
     for i in month:
@@ -150,9 +151,14 @@ async def upload_pdf(message: types.Message, bot,state: FSMContext):
     # вытаскиваем расширение
     ext = "pdf"
     filename = f"Оплата_от_{name} за {month}.{ext}"
+    filename1 = f"Вы оплатиле за {name} за {month}"
+
     # грузим в диск
     upload_to_google_drive(drive, buf, ext, FOLDER_ID,filename)
-    await message.answer(f"✅ оплата успешно прошла!")
+    await message.answer(f'''ДжазакиЛлаха хайран за оплату! 
+🌟{filename1}
+Я ещё совсем молодой и могу ошибаться. Если что-то пошло не так,
+напишите на Whatsapp +79788705926 или в родительскую группу, откуда вы попали сюда, и мы всё починим 🙂''')
     for i in month:
         mark_payment(name, i.lower())
     asyncio.create_task(delete_later(message, delay=24 * 3600))
